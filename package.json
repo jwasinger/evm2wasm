@@ -21,7 +21,7 @@
     "minimist": "^1.2.0",
     "standard": "^10.0.2",
     "tap-bail": "1.0.0",
-    "tape": "^4.6.0"
+    "tape": "4.7.0"
   },
   "repository": {
     "type": "git",
