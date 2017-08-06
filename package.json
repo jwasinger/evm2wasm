@@ -19,7 +19,7 @@
     "ethereumjs-vm": "^2.0.0",
     "ewasm-kernel": "git+https://github.com/ewasm/ewasm-kernel.git",
     "minimist": "^1.2.0",
-    "standard": "^10.0.2",
+    "standard": "^10.0.3",
     "tap-bail": "1.0.0",
     "tape": "^4.6.0"
   },
