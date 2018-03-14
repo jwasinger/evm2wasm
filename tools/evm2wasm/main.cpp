@@ -19,12 +19,12 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    string str(
+    string input_str(
         (std::istreambuf_iterator<char>(input)),
         std::istreambuf_iterator<char>()
     );
 
-    cout << evm2wasm(str) << endl;
+    cout << evm2wasm(input_str) << endl;
 
     return 0;
 }

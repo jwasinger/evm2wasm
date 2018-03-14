@@ -6,7 +6,7 @@
 
 std::string evm2wasm(const std::string& input);
 
-static std::map<int, std::tuple<std::string, int, int int>> opcodes = {
+static std::map<int, std::tuple<std::string, int, int, int>> opcodes = {
   {0x00, {"STOP", 0, 0, 0}},
   {0x01, {"ADD", 3, 2, 1}},
   {0x02, {"MUL", 5, 2, 1}},
@@ -20,7 +20,7 @@ static std::map<int, std::tuple<std::string, int, int int>> opcodes = {
   {0x0a, {"EXP", 10, 2, 1}},
   {0x0b, {"SIGNEXTEND", 5, 2, 1}},
 
-  {// 0x10 range - bit ops
+  // 0x10 range - bit ops
   {0x10, {"LT", 3, 2, 1}},
   {0x11, {"GT", 3, 2, 1}},
   {0x12, {"SLT", 3, 2, 1}},
@@ -33,10 +33,10 @@ static std::map<int, std::tuple<std::string, int, int int>> opcodes = {
   {0x19, {"NOT", 3, 1, 1}},
   {0x1a, {"BYTE", 3, 2, 1}},
 
-  {// 0x20 range - crypto
+  // 0x20 range - crypto
   {0x20, {"SHA3", 30, 2, 1}},
 
-  {// 0x30 range - closure state
+  // 0x30 range - closure state
   {0x30, {"ADDRESS", 0, 0, 1}},
   {0x31, {"BALANCE", 0, 1, 1}},
   {0x32, {"ORIGIN", 0, 0, 1}},
@@ -51,7 +51,7 @@ static std::map<int, std::tuple<std::string, int, int int>> opcodes = {
   {0x3b, {"EXTCODESIZE", 0, 1, 1}},
   {0x3c, {"EXTCODECOPY", 0, 4, 0}},
 
-  {// "0x40" range - block operations
+  // "0x40" range - block operations
   {0x40, {"BLOCKHASH", 0, 1, 1}},
   {0x41, {"COINBASE", 0, 0, 1}},
   {0x42, {"TIMESTAMP", 0, 0, 1}},
@@ -59,7 +59,7 @@ static std::map<int, std::tuple<std::string, int, int int>> opcodes = {
   {0x44, {"DIFFICULTY", 0, 0, 1}},
   {0x45, {"GASLIMIT", 0, 0, 1}},
 
-  {// 0x50 range - "storage" and execution
+  // 0x50 range - "storage" and execution
   {0x50, {"POP", 2, 1, 0}},
   {0x51, {"MLOAD", 3, 1, 1}},
   {0x52, {"MSTORE", 3, 2, 0}},
@@ -73,7 +73,7 @@ static std::map<int, std::tuple<std::string, int, int int>> opcodes = {
   {0x5a, {"GAS", 0, 0, 1}},
   {0x5b, {"JUMPDEST", 0, 0, 0}},
 
-  {// 0x60, range
+  // 0x60, range
   {0x60, {"PUSH", 3, 0, 1}},
   {0x61, {"PUSH", 3, 0, 1}},
   {0x62, {"PUSH", 3, 0, 1}},
@@ -147,13 +147,13 @@ static std::map<int, std::tuple<std::string, int, int int>> opcodes = {
   {0xa3, {"LOG", 0, 5, 0}},
   {0xa4, {"LOG", 0, 6, 0}},
 
-  {// "0xf0" range - closures
+  // "0xf0" range - closures
   {0xf0, {"CREATE", 0, 3, 1}},
   {0xf1, {"CALL", 0, 7, 1}},
   {0xf2, {"CALLCODE", 0, 7, 1}},
   {0xf3, {"RETURN", 0, 2, 0}},
   {0xf4, {"DELEGATECALL", 0, 6, 1}},
 
-  {// "0x70", range - other
+  // "0x70", range - other
   {0xff, {"SELFDESTRUCT", 0, 1, 0}}
 };
