@@ -6,7 +6,7 @@
 
 using namespace std;
 
-namespace {
+namespace evm2wasm {
 
 string wast2wasm(const string& input, bool debug = false) {
   wasm::Module module;
@@ -51,11 +51,15 @@ string wast2wasm(const string& input, bool debug = false) {
 string evm2wast(const string& input) {
   (void)input;
   // FIXME: do evm magic here
+  for(int i = 0; i< input.length(); ++i) {
+    auto op = opcodes.find(input[i]);
+    // std::cout << std::get<0>(*op) << std::endl;
+  };
   return "(module (export \"main\" (func $main)) (func $main))";
 }
-
-}
-
 string evm2wasm(const string& input) {
   return wast2wasm(evm2wast(input));
 }
+
+}
+
