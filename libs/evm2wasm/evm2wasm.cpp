@@ -58,11 +58,14 @@ string evm2wast(const string& evmCode) {
   // the transcompiled EVM code
   std::string wast;
   std::string segment;
+  //
   // keeps track of the gas that each section uses
   int gasCount = 0;
+
   // used for pruning dead code
   bool jumpFound = false;
-  // the accumlitive stack difference for the current segmnet
+
+  // the accumulative stack difference for the current segment
   int segmentStackDeta = 0;
   int segmentStackHigh = 0;
   int segmentStackLow = 0;
@@ -111,6 +114,7 @@ string evm2wast(const string& evmCode) {
     std::cout << "OPNAME: " << opname << " BASE COST: " << baseCost
       << " OFF STACK: " << offStack << " ON STACK: " << onStack << std::endl;
 
+    // TODO: fill in this table.
     switch(op) {
       case opcodeEnum::JUMP:
         break;
@@ -120,6 +124,7 @@ string evm2wast(const string& evmCode) {
   }
   return "(module (export \"main\" (func $main)) (func $main))";
 }
+
 string evm2wasm(const string& input) {
   return wast2wasm(evm2wast(input));
 }
