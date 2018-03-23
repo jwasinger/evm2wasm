@@ -1,4 +1,4 @@
-#!/usr/bin/env nodejs
+#!/usr/bin/env node
 
 const evm2wasm = require('../index.js')
 const argv = require('minimist')(process.argv.slice(2))
