@@ -79,6 +79,7 @@ const callbackFuncs = new Map([
  * @param {boolean} opts.inlineOps if `true` inlines the EVM1 operations (default: true)
  * @param {boolean} opts.wabt use wabt to compile wast to wasm instad of the built in JS module (default: false)
  * @param {String} opts.testName is the name used for the wast file (default: 'temp')
+ * @param {boolean} opts.chargePerOp if `true` adds metering statements for the wasm code section corresponding to each EVM opcode as opposed to metering once per branch segment (default: false).
  * @return {string}
  */
 exports.evm2wasm = function (evmCode, opts = {
@@ -114,6 +115,7 @@ exports.evm2wasm = function (evmCode, opts = {
  * @param {Object} opts
  * @param {boolean} opts.stackTrace if `true` generates a stack trace (default: false)
  * @param {boolean} opts.inlineOps if `true` inlines the EVM1 operations (default: true)
+ * @param {boolean} opts.chargePerOp if `true` adds metering statements for the wasm code section corresponding to each EVM opcode as opposed to metering once per branch segment (default: false).
  * @return {string}
  */
 exports.evm2wast = function (evmCode, opts = {
