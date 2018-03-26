@@ -85,7 +85,8 @@ exports.evm2wasm = function (evmCode, opts = {
   'stackTrace': false,
   'useAsyncAPI': false,
   'inlineOps': true,
-  'testName': 'temp'
+  'testName': 'temp',
+  'chargePerOp': false
 }) {
   const wast = exports.evm2wast(evmCode, opts)
   const testName = opts.testName
@@ -118,7 +119,8 @@ exports.evm2wasm = function (evmCode, opts = {
 exports.evm2wast = function (evmCode, opts = {
   'stackTrace': false,
   'useAsyncAPI': false,
-  'inlineOps': true
+  'inlineOps': true,
+  'chargePerOp': false
 }) {
   // adds stack height checks to the beginning of a segment
   function addStackCheck () {
@@ -139,7 +141,11 @@ exports.evm2wast = function (evmCode, opts = {
 
   // add a metering statment at the beginning of a segment
   function addMetering () {
-    wast += `(call $useGas (i64.const ${gasCount})) ` + segment
+    if (!opts.chargePerOp) {
+      wast += `(call $useGas (i64.const ${gasCount})) `
+    }
+
+    wast += segment
     segment = ''
     gasCount = 0
   }
@@ -175,6 +181,9 @@ exports.evm2wast = function (evmCode, opts = {
     const op = opcodes(opint)
 
     let bytes
+    if (opts.chargePerOp) {
+      segment += `(call $useGas (i64.const ${op.fee})) `
+    }
     gasCount += op.fee
 
     segmentStackDeta += op.on
