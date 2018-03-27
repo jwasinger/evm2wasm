@@ -17,7 +17,7 @@ function convert (bytecode, opts) {
         tempName: 'temp',
         inlineOps: true,
         wabt: false,
-        chargePerOp: false
+        chargePerOp: chargePerOp 
       })
       resolve(output)
     } else {
@@ -26,7 +26,7 @@ function convert (bytecode, opts) {
         tempName: 'temp',
         inlineOps: true,
         wabt: false,
-        chargePerOp: false
+        chargePerOp: chargePerOp
       }).then(function (output) {
         resolve(output)
       }).catch(function (err) {
@@ -52,6 +52,7 @@ const outputFile = argv.o ? argv.o : undefined
 const wast = argv.wast !== undefined
 const trace = argv.trace !== undefined
 const inputFile = argv.e ? argv.e : undefined
+const chargePerOp = argv.chargePerOp ? argv.chargePerOp : undefined
 
 let bytecode
 
