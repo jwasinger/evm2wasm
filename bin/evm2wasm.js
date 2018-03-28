@@ -52,7 +52,7 @@ const outputFile = argv.o ? argv.o : undefined
 const wast = argv.wast !== undefined
 const trace = argv.trace !== undefined
 const inputFile = argv.e ? argv.e : undefined
-const chargePerOp = argv.chargePerOp ? argv.chargePerOp : undefined
+const chargePerOp = argv['charge-per-op'] ? argv['charge-per-op'] : undefined
 
 let bytecode
 

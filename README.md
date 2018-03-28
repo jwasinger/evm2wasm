@@ -29,7 +29,7 @@ $ bin/evm2wasm.js -e `evm_bytecode_file` -o `wasm_output_file` --wast --trace
 
 #### Transcompile EVM to WAST with gas metering per transpiled EVM opcode (not per branch segment)
 ```
-$ bin/evm2wasm.js -e `evm_bytecode_file` -o `wasm_output_file` --wast --chargePerOp
+$ bin/evm2wasm.js -e `evm_bytecode_file` -o `wasm_output_file` --wast --charge-per-op
 ```
 
 # DEVELOP
