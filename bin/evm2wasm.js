@@ -17,7 +17,7 @@ function convert (bytecode, opts) {
         tempName: 'temp',
         inlineOps: true,
         wabt: false,
-        chargePerOp: chargePerOp
+        chargePerOp: true
       })
       resolve(output)
     } else {
@@ -26,7 +26,7 @@ function convert (bytecode, opts) {
         tempName: 'temp',
         inlineOps: true,
         wabt: false,
-        chargePerOp: chargePerOp
+        chargePerOp: true
       }).then(function (output) {
         resolve(output)
       }).catch(function (err) {
