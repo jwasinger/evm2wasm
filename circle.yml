@@ -1,0 +1,54 @@
+defaults:
+  install-deps: &install-deps
+    run:
+      name: "install deps"
+      command: |
+        apt update -y
+        apt install -y curl cmake
+        curl -sL https://deb.nodesource.com/setup_8.x | bash -
+        apt install -y nodejs
+  lint: &lint
+    run:
+      name: "Lint source code"
+      working_directory: ~/evm2wasm
+      command: |
+        npm run lint
+  build-wabt: &build-wabt
+    run:
+      name: "build wabt"
+      command: |
+        cd ~/projects/evm2wasm
+        cd tools/wabt
+        cmake -DBUILD_TESTS=OFF
+        make -j8
+  npm-install: &npm-install
+    run:
+      name: "install npm deps"
+      command: |
+        cd ~/projects/evm2wasm
+        npm install
+  state-tests: &state-tests
+    run:
+      name: "Run Ethereum state tests"
+      command: |
+        echo "ran the state tests"
+
+  state-test-steps: &state-test-steps
+    - checkout
+    - *install-deps
+    - *build-wabt
+    - *npm-install
+    - *state-tests
+
+version: 2
+jobs:
+  # to run this using local circleci tool, rename Ewasm-Tests to `build` then do `circleci build -c circle.yml`
+  build:
+    docker:
+      - image: ubuntu:xenial
+    steps: *state-test-steps
+
+workflows:
+  version: 2
+  build:
+    jobs: state-tests
