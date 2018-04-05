@@ -4,20 +4,19 @@ defaults:
       name: "install deps"
       command: |
         apt update -y
-        apt install -y curl cmake
+        apt install -y curl cmake git g++
         curl -sL https://deb.nodesource.com/setup_8.x | bash -
         apt install -y nodejs
   lint: &lint
     run:
       name: "Lint source code"
-      working_directory: ~/evm2wasm
       command: |
         npm run lint
   build-wabt: &build-wabt
     run:
       name: "build wabt"
       command: |
-        cd ~/projects/evm2wasm
+        git submodule update --init --recursive
         cd tools/wabt
         cmake -DBUILD_TESTS=OFF
         make -j8
@@ -25,7 +24,6 @@ defaults:
     run:
       name: "install npm deps"
       command: |
-        cd ~/projects/evm2wasm
         npm install
   state-tests: &state-tests
     run:
@@ -44,6 +42,7 @@ version: 2
 jobs:
   # to run this using local circleci tool, rename Ewasm-Tests to `build` then do `circleci build -c circle.yml`
   build:
+    working_directory: ~/projects
     docker:
       - image: ubuntu:xenial
     steps: *state-test-steps
