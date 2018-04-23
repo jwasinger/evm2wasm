@@ -682,10 +682,10 @@ std::string buildModule(const std::vector<std::string>& funcs,
             callbacksBuf << " " << callbacks[i];
         }
         callbackTableBuf << "\
-    (table\
-      (export \"callback\") ;; name of table\
-        anyfunc\
-        (elem {callbacksStr}) ;; elements will have indexes in order\
+    (table\n\
+      (export \"callback\") ;; name of table\n\
+        anyfunc\n\
+        (elem {callbacksStr}) ;; elements will have indexes in order\n\
       )"_format("callbacksStr"_a = callbacksBuf.str());
     }
 
@@ -700,26 +700,26 @@ std::string buildModule(const std::vector<std::string>& funcs,
     }
 
     return "\
-(module\
-  {importsStr}\
-  (global $cb_dest (mut i32) (i32.const 0))\
-  (global $sp (mut i32) (i32.const -32))\
-  (global $init (mut i32) (i32.const 0))\
-\
-  ;; memory related global\
-  (global $memstart i32  (i32.const 33832))\
-  ;; the number of 256 words stored in memory\
-  (global $wordCount (mut i64) (i64.const 0))\
-  ;; what was charged for the last memory allocation\
-  (global $prevMemCost (mut i64) (i64.const 0))\
-\
-  ;; TODO: memory should only be 1, but can\'t resize right now\
-  (memory 500)\
-  (export \"memory\" (memory 0))\
-\
-  {callbackTableStr}\
-\
-  {funcStr}\
+(module\n\
+  {importsStr}\n\
+  (global $cb_dest (mut i32) (i32.const 0))\n\
+  (global $sp (mut i32) (i32.const -32))\n\
+  (global $init (mut i32) (i32.const 0))\n\
+\n\
+  ;; memory related global\n\
+  (global $memstart i32  (i32.const 33832))\n\
+  ;; the number of 256 words stored in memory\n\
+  (global $wordCount (mut i64) (i64.const 0))\n\
+  ;; what was charged for the last memory allocation\n\
+  (global $prevMemCost (mut i64) (i64.const 0))\n\
+\n\
+  ;; TODO: memory should only be 1, but can\'t resize right now\n\
+  (memory 500)\n\
+  (export \"memory\" (memory 0))\n\
+\n\
+  {callbackTableStr}\n\
+\n\
+  {funcStr}\n\
 )"_format("importsStr"_a = importsBuf.str(), "callbackTableStr"_a = callbackTableBuf.str(),
         "funcStr"_a = funcBuf.str());
 }
@@ -752,23 +752,23 @@ std::string buildJumpMap(const std::vector<JumpSegment>& segments)
     std::string wasmStr = wasmBuf.str();
     wasmBuf.clear();
     wasmBuf << "\
-  (block $0\
-    (if\
-      (i32.eqz (get_global $init))\
-      (then\
-        (set_global $init (i32.const 1))\
-        (br $0))\
-      (else\
-        ;; the callback dest can never be in the first block\
-        (if (i32.eq (get_global $cb_dest) (i32.const 0)) \
-          (then\
-            {wasm}\
-          )\
-          (else \
-            ;; return callback destination and zero out $cb_dest \
-            get_global $cb_dest\
-            (set_global $cb_dest (i32.const 0))\
-            (br_table $0 {brTable})\
+  (block $0\n\
+    (if\n\
+      (i32.eqz (get_global $init))\n\
+      (then\n\
+        (set_global $init (i32.const 1))\n\
+        (br $0))\n\
+      (else\n\
+        ;; the callback dest can never be in the first block\n\
+        (if (i32.eq (get_global $cb_dest) (i32.const 0)) \n\
+          (then\n\
+            {wasm}\n\
+          )\n\
+          (else \n\
+            ;; return callback destination and zero out $cb_dest \n\
+            get_global $cb_dest\n\
+            (set_global $cb_dest (i32.const 0))\n\
+            (br_table $0 {brTable})\n\
           )))))"_format("wasm"_a = wasmStr, "brTable"_a = brTableBuf.str());
 
     return wasmBuf.str();
