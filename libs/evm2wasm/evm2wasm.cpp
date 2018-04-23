@@ -71,7 +71,19 @@ string wast2wasm(const string& input, bool debug = false)
     return output.str();
 }
 
-string evm2wast(const string& evmCode, bool stackTrace, bool useAsyncAPI, bool inlineOps)
+std::string HexToBytes(const std::string& hex) {
+  std::vector<char> bytes;
+
+  for (unsigned int i = 0; i < hex.length(); i += 2) {
+    std::string byteString = hex.substr(i, 2);
+    char byte = (char) strtol(byteString.c_str(), NULL, 16);
+    bytes.push_back(byte);
+  }
+
+  return std::string(bytes.begin(), bytes.end());
+}
+
+string evm2wast(const std::vector<char>& evmCode, bool stackTrace, bool useAsyncAPI, bool inlineOps)
 {
     // FIXME: do evm magic here
     // this keep track of the opcode we have found so far. This will be used to
@@ -136,12 +148,12 @@ string evm2wast(const string& evmCode, bool stackTrace, bool useAsyncAPI, bool i
         addMetering();
     };
 
-    for (size_t pc = 0; pc < evmCode.length(); pc++)
+    for (size_t pc = 0; pc < evmCode.size(); pc++)
     {
         auto opint = evmCode[pc];
         auto op = opcodes(opint);
 
-        std::string bytes;
+        std::vector<char> bytes;
         gasCount += op.fee;
 
         segmentStackDeta += op.on;
@@ -219,7 +231,7 @@ string evm2wast(const string& evmCode, bool stackTrace, bool useAsyncAPI, bool i
         {
             pc++;
             size_t sliceSize = std::min(op.number, 32ul);
-            bytes = evmCode.substr(pc, pc + sliceSize);
+            bytes = std::vector<char>(evmCode.begin() + pc, evmCode.begin() + pc + sliceSize);
             pc += op.number;
             if (op.number < 32)
             {
@@ -239,7 +251,9 @@ string evm2wast(const string& evmCode, bool stackTrace, bool useAsyncAPI, bool i
 
             for (; q < 4; q++)
             {
-                auto int64 = reinterpret_cast<int64_t>(bytes.substr(q * 8, q * 8 + 8).c_str());
+                //auto int64 = reinterpret_cast<int64_t>(bytes.substr(q * 8, q * 8 + 8).c_str());
+                auto int64 = reinterpret_cast<int64_t>(&bytes[q*8]);
+
                 push << "(i64.const {int64})"_format("int64"_a = int64);
             }
 
@@ -259,7 +273,7 @@ string evm2wast(const string& evmCode, bool stackTrace, bool useAsyncAPI, bool i
             else
             {
                 // the rest is dead code;
-                pc = evmCode.length();
+                pc = evmCode.size();
             }
             break;
         case opcodeEnum::SELFDESTRUCT:
@@ -272,7 +286,7 @@ string evm2wast(const string& evmCode, bool stackTrace, bool useAsyncAPI, bool i
             else
             {
                 // the rest is dead code
-                pc = evmCode.length();
+                pc = evmCode.size();
             }
             break;
         case opcodeEnum::INVALID:
@@ -394,9 +408,10 @@ std::string assembleSegments(const std::vector<JumpSegment>& segments)
     return result;
 }
 
-string evm2wasm(const string& input)
+string evm2wasm(const std::vector<char>& input)
 {
-    return wast2wasm(evm2wast(input));
+    std::string wast = evm2wast(input);
+    return wast2wasm(wast, true);
 }
 
 std::string opcodeToString(opcodeEnum opcode)
@@ -583,9 +598,9 @@ Op opcodes(int op)
 // @param {Array} evmCode
 // @param {Integer} index
 // @return {Integer}
-size_t findNextJumpDest(const std::string& evmCode, size_t i)
+size_t findNextJumpDest(const std::vector<char>& evmCode, size_t i)
 {
-    for (; i < evmCode.length(); i++)
+    for (; i < evmCode.size(); i++)
     {
         auto opint = evmCode[i];
         auto op = opcodes(opint);

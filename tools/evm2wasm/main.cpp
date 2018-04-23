@@ -7,6 +7,18 @@
 
 using namespace std;
 
+std::vector<char> HexToBytes(const std::string& hex) {
+    std::vector<char> bytes;
+
+    for (unsigned int i = 0; i < hex.length()-1; i += 2) {
+        std::string byteString = hex.substr(i, 2);
+        char byte = (char) strtol(byteString.c_str(), NULL, 16);
+        bytes.push_back(byte);
+    }
+
+    return bytes;
+}
+
 int main(int argc, char **argv) {
     if (argc < 2) {
         cerr << "Usage: " << argv[0] << " <EVM file> [--wast]" << endl;
@@ -33,10 +45,12 @@ int main(int argc, char **argv) {
         std::istreambuf_iterator<char>()
     );
 
+    std::vector<char> evmCode = HexToBytes(input_str);
+
     if(wast) {
-        cout << evm2wasm::evm2wast(input_str) << endl;
+        cout << evm2wasm::evm2wast(evmCode) << endl;
     } else {
-        cout << evm2wasm::evm2wasm(input_str) << endl;
+        cout << evm2wasm::evm2wasm(evmCode) << endl;
     }
 
     return 0;
