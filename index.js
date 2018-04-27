@@ -336,12 +336,13 @@ exports.evm2wast = function (evmCode, opts = {
         type: 'cb_dest'
       })
     }
+
+    // creates a stack trace
+    if (opts.stackTrace) {
+      segment += `(call $stackTrace (i32.const ${pc}) (i32.const ${opint}) (i32.const ${gasCount}) (get_global $sp))\n`
+    }
   }
 
-  // creates a stack trace
-  if (opts.stackTrace) {
-    segment += `(call $stackTrace (i32.const ${pc}) (i32.const ${opint}) (i32.const ${gasCount}) (get_global $sp))\n`
-  }
 
   endSegment()
 
