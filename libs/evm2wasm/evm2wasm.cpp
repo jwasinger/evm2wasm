@@ -410,7 +410,7 @@ std::string assembleSegments(const std::vector<JumpSegment>& segments)
     return result;
 }
 
-string evm2wasm(const string& input, bool tracing = false)
+string evm2wasm(const string& input, bool tracing)
 {
     string wast = evm2wast(input, tracing);
     return wast2wasm(wast, true);
