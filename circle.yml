@@ -1,16 +1,16 @@
 defaults:
-
-  npm-install: &npm-install
-    run:
-      name: "Install npm deps"
-      command: |
-        npm install --no-package-lock
-
   lint: &lint
     run:
       name: "Lint source code"
       command: |
         npm run lint
+
+  install-clang-format: &install-clang-format
+    run:
+      name: "install clang-format"
+      command: |
+        sudo apt update -y
+        sudo apt install -y clang-format
 
   validate-build: &validate-build
     run:
@@ -25,18 +25,36 @@ defaults:
         URL=https://github.com/ethereum/cpp-ethereum/releases/download/v1.4.0.dev0/cpp-ethereum-1.4.0.dev0-linux.tar.gz
         curl -L $URL | sudo tar xz -C /usr/local
 
+  clone-hera: &clone-hera
+    run:
+      name: "Clone Hera"
+      command: |
+        cd ..
+        git clone https://github.com/ewasm/hera -b evm2wasm-api
+        cd hera
+        git submodule update --init --recursive
+        rm -rf evm2wasm
+        mv ../evm2wasm .
+        ls
+
+  validate-imports: &validate-imports
+    run:
+      name: "validate evm2wasm imports"
+      command: |
+        cd ..
+        cd hera/evm2wasm
+        clang-format -i $(find . -name "*\.cpp" -o -name "*\.h" -not -name "wast.h" -not -name "wast-async.h")
+        git diff --exit-code
+
   build-hera: &build-hera
     run: 
       name: "build hera"
       working_directory: ~
       command: |
-        git clone https://github.com/ewasm/hera
         cd hera
-        git reset 817d85bb4f09d24f11ddfc67bcc548032f708cfc --hard
-        git submodule update --init --recursive
         cmake -DBUILD_SHARED_LIBS=ON .
         make -j8
-        mv ~/evm2wasm/hera/src/libhera.so ~/libhera.so
+        mv ~/hera/src/libhera.so ~/libhera.so
 
   vm-tests: &vm-tests
     run:
@@ -69,9 +87,8 @@ defaults:
         source $BASH_ENV
         echo "running testeth command..."
         testeth -t GeneralStateTests/stExample -- --testpath ~/tests --singlenet "Byzantium" --singletest "add11" --vm ~/libhera.so --evmc evm2wasm.js-trace=true
-        testeth -t GeneralStateTests/stStackTests -- --testpath ~/tests --singlenet "Byzantium" --vm ~/libhera.so --evmc evm2wasm.js=true
-        testeth -t GeneralStateTests/stBadOpcode -- --testpath ~/tests --singlenet "Byzantium" --vm ~/libhera.so --evmc evm2wasm.js=true
-        testeth -t GeneralStateTests/stCallCodes -- --testpath ~/tests --singlenet "Byzantium" --singletest "callcall_00" --vm ~/libhera.so --evmc evm2wasm.js=true
+        testeth -t GeneralStateTests/stStackTests -- --testpath ~/tests --singlenet "Byzantium" --vm ~/libhera.so --evmc evm2wasm.cpp=true
+        testeth -t GeneralStateTests/stBadOpcode -- --testpath ~/tests --singlenet "Byzantium" --vm ~/libhera.so --evmc evm2wasm.cpp=true
         echo "ran the state tests."
 
   cli-tests: &cli-tests
@@ -84,15 +101,11 @@ defaults:
 
   state-test-steps: &state-test-steps
     - checkout
-    - *npm-install
-    - *lint
-    - *validate-build
+    - *install-clang-format
     - *clone-tests
-    #- *build-cpp
-    #- *cli-tests # weird chars mess up the console
-    #- *vm-tests # vm-tests temporarily disabled until ewasm-kernel is fixed
-    # - *print-cpp-hera-version
     - *install-cpp-ethereum
+    - *clone-hera
+    - *validate-imports
     - *build-hera
     # - *store-hera
     - *state-tests
@@ -103,7 +116,7 @@ jobs:
   build:
     working_directory: ~/evm2wasm
     docker:
-      - image: cdetrio/nodejs-cpp-build-env
+      - image: ethereum/cpp-build-env
     steps: *state-test-steps
 
 workflows:
